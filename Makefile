@@ -2,7 +2,7 @@
 WORKD_DIR_ROOT := $(shell pwd)
 CACHE_ROOT := "${WORKD_DIR_ROOT}/.cache"
 
-all: build-etcd build-k8s download-runc build-cni-plugin download-protoc build-containerd
+all: build-etcd build-k8s download-runc build-cni-plugin download-protoc build-containerd build-pause
 	echo "hello world"
 
 create-cache-folder:
@@ -47,3 +47,7 @@ download-containerd: create-cache-folder
 build-containerd: download-containerd
 	bash ${WORKD_DIR_ROOT}/scripts/build-containerd.bash ${WORKD_DIR_ROOT} | \
 	sed -u 's/^/[Build containerd] /'
+
+build-pause:
+	bash ${WORKD_DIR_ROOT}/scripts/build-pause.bash ${WORKD_DIR_ROOT} | \
+	sed -u 's/^/[Build pause] /'
