@@ -5,7 +5,7 @@ CACHE_ROOT := "${WORKD_DIR_ROOT}/.cache"
 all: build-binaries
 	echo "hello world"
 
-build-binaries: download-stuff build-stuff
+build-binaries: download-stuff build-stuff create-certificates
 
 download-stuff: build-etcd build-k8s build-cni-plugin build-containerd build-pause
 
@@ -61,3 +61,7 @@ build-pause:
 download-crictl:
 	bash ${WORKD_DIR_ROOT}/scripts/download-crictl.bash ${WORKD_DIR_ROOT} | \
 	sed -u 's/^/[Download pause] /'
+
+create-certificates:
+	bash ${WORKD_DIR_ROOT}/scripts/create-certificates.bash ${WORKD_DIR_ROOT} 2>&1 | \
+	sed -u 's/^/[Create certificates] /'
