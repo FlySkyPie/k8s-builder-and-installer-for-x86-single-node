@@ -2,7 +2,7 @@
 WORKD_DIR_ROOT := $(shell pwd)
 CACHE_ROOT := "${WORKD_DIR_ROOT}/.cache"
 
-all: build-etcd build-k8s
+all: build-etcd build-k8s download-runc
 	echo "hello world"
 
 create-cache-folder:
@@ -54,3 +54,6 @@ build-k8s: download-k8s
 		if [ ! -f ${CACHE_ROOT}/kubernetes/_output/dockerized/bin/linux/386/kube-proxy ]; then \
 		build/run.sh make kube-proxy KUBE_BUILD_PLATFORMS=linux/386; \
 	fi;
+
+download-runc: create-cache-folder
+	bash ${WORKD_DIR_ROOT}/scripts/download-runc.bash ${WORKD_DIR_ROOT}
