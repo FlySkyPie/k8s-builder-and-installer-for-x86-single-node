@@ -17,33 +17,12 @@ build-etcd: download-etcd
 	sed -u 's/^/[Build etcd] /'
 
 download-k8s: create-cache-folder
-	if [ -d ${CACHE_ROOT}/kubernetes/ ]; then \
-		echo "kubernetes folder is finished, skip."; \
-		exit 0; \
-	fi; \
-	cd ${CACHE_ROOT}; \
-	git clone --depth 1 --branch  v1.21.0 https://github.com/kubernetes/kubernetes.git;
+	bash ${WORKD_DIR_ROOT}/scripts/download-k8s.bash ${WORKD_DIR_ROOT} | \
+	sed -u 's/^/[Download K8s] /'
 
 build-k8s: download-k8s
-	cd ${CACHE_ROOT}/kubernetes; \
-	if [ ! -f ${CACHE_ROOT}/kubernetes/_output/dockerized/bin/linux/386/kubectl ]; then \
-		build/run.sh make kubectl KUBE_BUILD_PLATFORMS=linux/386; \
-	fi; \
-	if [ ! -f ${CACHE_ROOT}/kubernetes/_output/dockerized/bin/linux/386/kube-scheduler ]; then \
-		build/run.sh make kube-scheduler KUBE_BUILD_PLATFORMS=linux/386; \
-	fi; \
-	if [ ! -f ${CACHE_ROOT}/kubernetes/_output/dockerized/bin/linux/386/kube-apiserver ]; then \
-		build/run.sh make kube-apiserver KUBE_BUILD_PLATFORMS=linux/386; \
-	fi; \
-	if [ ! -f ${CACHE_ROOT}/kubernetes/_output/dockerized/bin/linux/386/kube-controller-manager ]; then \
-		build/run.sh make kube-controller-manager KUBE_BUILD_PLATFORMS=linux/386; \
-	fi; \
-	if [ ! -f ${CACHE_ROOT}/kubernetes/_output/dockerized/bin/linux/386/kubelet ]; then \
-		build/run.sh make kubelet KUBE_BUILD_PLATFORMS=linux/386; \
-	fi; \
-		if [ ! -f ${CACHE_ROOT}/kubernetes/_output/dockerized/bin/linux/386/kube-proxy ]; then \
-		build/run.sh make kube-proxy KUBE_BUILD_PLATFORMS=linux/386; \
-	fi;
+	bash ${WORKD_DIR_ROOT}/scripts/build-k8s.bash ${WORKD_DIR_ROOT} | \
+	sed -u 's/^/[Build K8s] /'
 
 download-runc: create-cache-folder
 	bash ${WORKD_DIR_ROOT}/scripts/download-runc.bash ${WORKD_DIR_ROOT} | \
