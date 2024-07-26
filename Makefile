@@ -2,7 +2,7 @@
 WORKD_DIR_ROOT := $(shell pwd)
 CACHE_ROOT := "${WORKD_DIR_ROOT}/.cache"
 
-all: build-etcd build-k8s download-runc build-cni-plugin
+all: build-etcd build-k8s download-runc build-cni-plugin download-protoc
 	echo "hello world"
 
 create-cache-folder:
@@ -63,3 +63,6 @@ download-cni-plugin:
 
 build-cni-plugin: download-cni-plugin
 	bash ${WORKD_DIR_ROOT}/scripts/build-cni-plugin.bash ${WORKD_DIR_ROOT}
+
+download-protoc: 
+	bash ${WORKD_DIR_ROOT}/scripts/download-protoc.bash ${WORKD_DIR_ROOT}
