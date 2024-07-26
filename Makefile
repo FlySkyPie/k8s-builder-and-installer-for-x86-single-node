@@ -9,22 +9,12 @@ create-cache-folder:
 	mkdir -p ${CACHE_ROOT}
 
 download-etcd: create-cache-folder
-	if [ -d ${CACHE_ROOT}/etcd/ ]; then \
-		echo "etcd folder is finished, skip."; \
-		exit 0; \
-	fi; \
-	cd ${CACHE_ROOT}; \
-	git clone https://github.com/etcd-io/etcd.git;
+	bash ${WORKD_DIR_ROOT}/scripts/download-etcd.bash ${WORKD_DIR_ROOT} | \
+	sed -u 's/^/[Download etcd] /'
 
 build-etcd: download-etcd
-	if [ -f ${CACHE_ROOT}/etcd/bin/etcd ] && [ -f ${CACHE_ROOT}/etcd/bin/etcdctl ]; then \
-		echo "etcd build is finished, skip."; \
-		exit 0; \
-	fi; \
-	cd ${CACHE_ROOT}/etcd; \
-	git checkout v3.4.15; \
-	go mod vendor; \
-	env GOOS=linux GOARCH=386 ./build
+	bash ${WORKD_DIR_ROOT}/scripts/build-etcd.bash ${WORKD_DIR_ROOT} | \
+	sed -u 's/^/[Build etcd] /'
 
 download-k8s: create-cache-folder
 	if [ -d ${CACHE_ROOT}/kubernetes/ ]; then \
@@ -56,19 +46,25 @@ build-k8s: download-k8s
 	fi;
 
 download-runc: create-cache-folder
-	bash ${WORKD_DIR_ROOT}/scripts/download-runc.bash ${WORKD_DIR_ROOT} | sed -u 's/^/[download-runc] /'
+	bash ${WORKD_DIR_ROOT}/scripts/download-runc.bash ${WORKD_DIR_ROOT} | \
+	sed -u 's/^/[Download runc] /'
 
 download-cni-plugin:
-	bash ${WORKD_DIR_ROOT}/scripts/download-cni-plugin.bash ${WORKD_DIR_ROOT} | sed -u 's/^/[download-cni-plugin] /'
+	bash ${WORKD_DIR_ROOT}/scripts/download-cni-plugin.bash ${WORKD_DIR_ROOT} | \
+	sed -u 's/^/[Download cni-plugin] /'
 
 build-cni-plugin: download-cni-plugin
-	bash ${WORKD_DIR_ROOT}/scripts/build-cni-plugin.bash ${WORKD_DIR_ROOT} | sed -u 's/^/[build-cni-plugin] /'
+	bash ${WORKD_DIR_ROOT}/scripts/build-cni-plugin.bash ${WORKD_DIR_ROOT} | \
+	sed -u 's/^/[Build cni-plugin] /'
 
 download-protoc: 
-	bash ${WORKD_DIR_ROOT}/scripts/download-protoc.bash ${WORKD_DIR_ROOT} | sed -u 's/^/[download-protoc] /'
+	bash ${WORKD_DIR_ROOT}/scripts/download-protoc.bash ${WORKD_DIR_ROOT} | \
+	sed -u 's/^/[Download protoc] /'
 
 download-containerd: create-cache-folder
-	bash ${WORKD_DIR_ROOT}/scripts/download-containerd.bash ${WORKD_DIR_ROOT} | sed -u 's/^/[download-containerd] /'
+	bash ${WORKD_DIR_ROOT}/scripts/download-containerd.bash ${WORKD_DIR_ROOT} | \
+	sed -u 's/^/[Download containerd] /'
 
 build-containerd: download-containerd
-	bash ${WORKD_DIR_ROOT}/scripts/build-containerd.bash ${WORKD_DIR_ROOT} | sed -u 's/^/[build-containerd] /'
+	bash ${WORKD_DIR_ROOT}/scripts/build-containerd.bash ${WORKD_DIR_ROOT} | \
+	sed -u 's/^/[Build containerd] /'
