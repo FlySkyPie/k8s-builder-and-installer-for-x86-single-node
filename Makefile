@@ -2,7 +2,7 @@
 WORKD_DIR_ROOT := $(shell pwd)
 CACHE_ROOT := "${WORKD_DIR_ROOT}/.cache"
 
-all: build-etcd build-k8s download-runc
+all: build-etcd build-k8s download-runc build-cni-plugin
 	echo "hello world"
 
 create-cache-folder:
@@ -27,7 +27,7 @@ build-etcd: download-etcd
 	env GOOS=linux GOARCH=386 ./build
 
 download-k8s: create-cache-folder
-	if [ -d ${CACHE_ROOT}/etcd/ ]; then \
+	if [ -d ${CACHE_ROOT}/kubernetes/ ]; then \
 		echo "kubernetes folder is finished, skip."; \
 		exit 0; \
 	fi; \
@@ -57,3 +57,9 @@ build-k8s: download-k8s
 
 download-runc: create-cache-folder
 	bash ${WORKD_DIR_ROOT}/scripts/download-runc.bash ${WORKD_DIR_ROOT}
+
+download-cni-plugin:
+	bash ${WORKD_DIR_ROOT}/scripts/download-cni-plugin.bash ${WORKD_DIR_ROOT}
+
+build-cni-plugin: download-cni-plugin
+	bash ${WORKD_DIR_ROOT}/scripts/build-cni-plugin.bash ${WORKD_DIR_ROOT}

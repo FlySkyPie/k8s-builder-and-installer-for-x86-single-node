@@ -3,7 +3,10 @@
 WORKD_DIR_ROOT=$1
 CACHE_ROOT="${WORKD_DIR_ROOT}/.cache"
 
-# echo CACHE_ROOT ${CACHE_ROOT}
+if [ -f ${CACHE_ROOT}/runc/runc.386 ]; then
+    echo "runc file is existing, skip."
+    exit 0
+fi
 
 mkdir -p ${CACHE_ROOT}/runc
 
