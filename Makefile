@@ -2,7 +2,7 @@
 WORKD_DIR_ROOT := $(shell pwd)
 CACHE_ROOT := "${WORKD_DIR_ROOT}/.cache"
 
-all: build-etcd build-k8s download-runc build-cni-plugin download-protoc
+all: build-etcd build-k8s download-runc build-cni-plugin download-protoc build-containerd
 	echo "hello world"
 
 create-cache-folder:
@@ -56,13 +56,19 @@ build-k8s: download-k8s
 	fi;
 
 download-runc: create-cache-folder
-	bash ${WORKD_DIR_ROOT}/scripts/download-runc.bash ${WORKD_DIR_ROOT}
+	bash ${WORKD_DIR_ROOT}/scripts/download-runc.bash ${WORKD_DIR_ROOT} | sed -u 's/^/[download-runc] /'
 
 download-cni-plugin:
-	bash ${WORKD_DIR_ROOT}/scripts/download-cni-plugin.bash ${WORKD_DIR_ROOT}
+	bash ${WORKD_DIR_ROOT}/scripts/download-cni-plugin.bash ${WORKD_DIR_ROOT} | sed -u 's/^/[download-cni-plugin] /'
 
 build-cni-plugin: download-cni-plugin
-	bash ${WORKD_DIR_ROOT}/scripts/build-cni-plugin.bash ${WORKD_DIR_ROOT}
+	bash ${WORKD_DIR_ROOT}/scripts/build-cni-plugin.bash ${WORKD_DIR_ROOT} | sed -u 's/^/[build-cni-plugin] /'
 
 download-protoc: 
-	bash ${WORKD_DIR_ROOT}/scripts/download-protoc.bash ${WORKD_DIR_ROOT}
+	bash ${WORKD_DIR_ROOT}/scripts/download-protoc.bash ${WORKD_DIR_ROOT} | sed -u 's/^/[download-protoc] /'
+
+download-containerd: create-cache-folder
+	bash ${WORKD_DIR_ROOT}/scripts/download-containerd.bash ${WORKD_DIR_ROOT} | sed -u 's/^/[download-containerd] /'
+
+build-containerd: download-containerd
+	bash ${WORKD_DIR_ROOT}/scripts/build-containerd.bash ${WORKD_DIR_ROOT} | sed -u 's/^/[build-containerd] /'
