@@ -3,16 +3,19 @@
 WORKD_DIR_ROOT=$1
 CACHE_ROOT="${WORKD_DIR_ROOT}/.cache"
 
+NODE_NAME="arachne-node-alpha"
+NODE_IP="192.168.0.144"
+
 mkdir -p ${CACHE_ROOT}/certificates
 cd ${CACHE_ROOT}/certificates
 
 if ! command -v cfssl &>/dev/null; then
-    echo "cfssl could not be found"
-    exit 1
+  echo "cfssl could not be found"
+  exit 1
 fi
 if ! command -v cfssljson &>/dev/null; then
-    echo "cfssljson could not be found"
-    exit 1
+  echo "cfssljson could not be found"
+  exit 1
 fi
 
 echo "[Certificate Authority]"
@@ -78,19 +81,19 @@ cat >admin-csr.json <<EOF
 EOF
 
 cfssl gencert \
-    -ca=ca.pem \
-    -ca-key=ca-key.pem \
-    -config=ca-config.json \
-    -profile=kubernetes \
-    admin-csr.json | cfssljson -bare admin
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -profile=kubernetes \
+  admin-csr.json | cfssljson -bare admin
 
 # ===============
 
 echo "[The Kubelet Client Certificates]"
 
-cat >node-csr.json <<EOF
+cat >${NODE_NAME}-csr.json <<EOF
 {
-  "CN": "system:node:node",
+  "CN": "system:node:${NODE_NAME}",
   "key": {
     "algo": "rsa",
     "size": 2048
@@ -108,12 +111,42 @@ cat >node-csr.json <<EOF
 EOF
 
 cfssl gencert \
-    -ca=ca.pem \
-    -ca-key=ca-key.pem \
-    -config=ca-config.json \
-    -hostname=node,${EXTERNAL_IP},127.0.0.1 \
-    -profile=kubernetes \
-    node-csr.json | cfssljson -bare node
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -hostname=${NODE_NAME},${NODE_IP},127.0.0.1 \
+  -profile=kubernetes \
+  ${NODE_NAME}-csr.json | cfssljson -bare ${NODE_NAME}
+
+# ===============
+
+echo "[The Controller Manager Client Certificate]"
+
+cat >kube-controller-manager-csr.json <<EOF
+{
+  "CN": "system:kube-controller-manager",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "US",
+      "L": "Portland",
+      "O": "system:kube-controller-manager",
+      "OU": "Kubernetes The Hard Way",
+      "ST": "Oregon"
+    }
+  ]
+}
+EOF
+
+cfssl gencert \
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -profile=kubernetes \
+  kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
 
 # ===============
 
@@ -139,15 +172,47 @@ cat >kube-proxy-csr.json <<EOF
 EOF
 
 cfssl gencert \
-    -ca=ca.pem \
-    -ca-key=ca-key.pem \
-    -config=ca-config.json \
-    -profile=kubernetes \
-    kube-proxy-csr.json | cfssljson -bare kube-proxy
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -profile=kubernetes \
+  kube-proxy-csr.json | cfssljson -bare kube-proxy
+
+# ===============
+
+echo "[The Scheduler Client Certificate]"
+
+cat >kube-scheduler-csr.json <<EOF
+{
+  "CN": "system:kube-scheduler",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "US",
+      "L": "Portland",
+      "O": "system:kube-scheduler",
+      "OU": "Kubernetes The Hard Way",
+      "ST": "Oregon"
+    }
+  ]
+}
+EOF
+
+cfssl gencert \
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -profile=kubernetes \
+  kube-scheduler-csr.json | cfssljson -bare kube-scheduler
 
 # ===============
 
 echo "[The Kubernetes API Server Certificate]"
+
+KUBERNETES_HOSTNAMES=kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local
 
 cat >kubernetes-csr.json <<EOF
 {
@@ -169,9 +234,39 @@ cat >kubernetes-csr.json <<EOF
 EOF
 
 cfssl gencert \
-    -ca=ca.pem \
-    -ca-key=ca-key.pem \
-    -config=ca-config.json \
-    -hostname=10.32.0.1,10.240.0.10,10.240.0.11,10.240.0.12,${KUBERNETES_PUBLIC_ADDRESS},127.0.0.1,kubernetes.default \
-    -profile=kubernetes \
-    kubernetes-csr.json | cfssljson -bare kubernetes
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -hostname=${NODE_IP},127.0.0.1,${KUBERNETES_HOSTNAMES} \
+  -profile=kubernetes \
+  kubernetes-csr.json | cfssljson -bare kubernetes
+
+# ===============
+
+echo "[The Service Account Key Pair]"
+
+cat >service-account-csr.json <<EOF
+{
+  "CN": "service-accounts",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "US",
+      "L": "Portland",
+      "O": "Kubernetes",
+      "OU": "Kubernetes The Hard Way",
+      "ST": "Oregon"
+    }
+  ]
+}
+EOF
+
+cfssl gencert \
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -profile=kubernetes \
+  service-account-csr.json | cfssljson -bare service-account
