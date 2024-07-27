@@ -12,6 +12,12 @@ pyenv install 3.11.9
 poetry install
 ```
 
+or, you can use the easy way:
+
+```shell
+sudo apt install ansible
+```
+
 ## Ansible
 
 Entry the Poetry shell to using ansible.
@@ -20,4 +26,3 @@ Entry the Poetry shell to using ansible.
 poetry shell
 ansible --version
 ```
-
