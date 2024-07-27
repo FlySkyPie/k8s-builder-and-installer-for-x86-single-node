@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "k8s-builder-and-installer-for-x86-single-node"
+version = "0.1.0"
+description = ""
+authors = ["Wei Ji (FlySkyPie) <c445dj544@gmail.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+ansible = "^10.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
