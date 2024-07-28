@@ -1,0 +1,36 @@
+---
+- name: Deploy etcd
+  hosts: arachne-node-alpha
+  tasks:
+    - name: Copy executable - etcd
+      ansible.builtin.copy:
+        src: "{{ items }}"
+        dest: /usr/local/bin/etcd
+        owner: root
+        group: root
+        mode: "0755"
+      loop:
+        - ../../.cache/etcd/bin/etcd
+        - ../../.cache/etcd/bin/etcdctl
+
+    - name: Create folders
+      ansible.builtin.command: mkdir -p /etc/etcd /var/lib/etcd
+      register: mymotd
+      changed_when: false
+
+    - name: Change permissions
+      ansible.builtin.command: chmod 700 /var/lib/etcd
+      register: mymotd
+      changed_when: false
+
+    - name: Copy certificates
+      ansible.builtin.copy:
+        src: "{{ items }}"
+        dest: /etc/etcd/
+        owner: root
+        group: root
+        mode: "0755"
+      loop:
+        - ../../.cache/certificates/ca.pem
+        - ../../.cache/certificates/kubernetes-key.pem
+        - ../../.cache/certificates/kubernetes.pem
