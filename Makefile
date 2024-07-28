@@ -2,10 +2,10 @@
 WORKD_DIR_ROOT := $(shell pwd)
 CACHE_ROOT := "${WORKD_DIR_ROOT}/.cache"
 
-all: build-binaries
+all: download-stuff  build-stuff
 	echo "hello world"
 
-build-binaries: download-stuff build-stuff create-certificates
+build-stuff: build-stuff create-certificates create-service-file
 
 download-stuff: build-etcd build-k8s build-cni-plugin build-containerd build-pause
 
@@ -65,3 +65,7 @@ download-crictl:
 create-certificates:
 	bash ${WORKD_DIR_ROOT}/scripts/create-certificates.bash ${WORKD_DIR_ROOT} 2>&1 | \
 	sed -u 's/^/[Create certificates] /'
+
+create-service-file:
+	bash ${WORKD_DIR_ROOT}/scripts/create-service-file.bash ${WORKD_DIR_ROOT} 2>&1 | \
+	sed -u 's/^/[Create Service File] /'
