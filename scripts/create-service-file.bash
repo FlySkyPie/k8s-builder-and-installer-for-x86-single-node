@@ -3,7 +3,7 @@
 WORKD_DIR_ROOT=$1
 CACHE_ROOT="${WORKD_DIR_ROOT}/.cache"
 
-ETCD_NAME="arachne-node-alpha"
+# ETCD_NAME="arachne-node-alpha"
 INTERNAL_IP="192.168.0.144"
 
 mkdir -p ${CACHE_ROOT}/services
@@ -18,8 +18,9 @@ Documentation=https://etcd.io/
 
 [Service]
 Type=notify
+Environment="ETCD_UNSUPPORTED_ARCH=386" # for the i386 architecture only
 ExecStart=/usr/local/bin/etcd \\
-  --name ${ETCD_NAME} \\
+  --name controller \\
   --cert-file=/etc/etcd/kubernetes.pem \\
   --key-file=/etc/etcd/kubernetes-key.pem \\
   --peer-cert-file=/etc/etcd/kubernetes.pem \\

@@ -24,5 +24,22 @@ Entry the Poetry shell to using ansible.
 
 ```shell
 poetry shell
+
 ansible --version
+ansible-lint --version # Linter
 ```
+
+## Prepare Elements
+
+```shell
+make
+```
+
+## Deploy
+
+### Deploy etcd
+
+```shell
+ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/deploy-etcd.yml
+```
+

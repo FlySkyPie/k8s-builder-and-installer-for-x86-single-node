@@ -4,8 +4,8 @@
   tasks:
     - name: Copy executable - etcd
       ansible.builtin.copy:
-        src: "{{ items }}"
-        dest: /usr/local/bin/etcd
+        src: "{{ item }}"
+        dest: /usr/local/bin/
         owner: root
         group: root
         mode: "0755"
@@ -16,21 +16,36 @@
     - name: Create folders
       ansible.builtin.command: mkdir -p /etc/etcd /var/lib/etcd
       register: mymotd
-      changed_when: false
+      changed_when: true
 
     - name: Change permissions
       ansible.builtin.command: chmod 700 /var/lib/etcd
       register: mymotd
-      changed_when: false
+      changed_when: true
 
     - name: Copy certificates
       ansible.builtin.copy:
-        src: "{{ items }}"
+        src: "{{ item }}"
         dest: /etc/etcd/
         owner: root
         group: root
-        mode: "0755"
+        mode: "0600"
       loop:
         - ../../.cache/certificates/ca.pem
         - ../../.cache/certificates/kubernetes-key.pem
         - ../../.cache/certificates/kubernetes.pem
+
+    - name: Copy service file
+      ansible.builtin.copy:
+        src: ../../.cache/services/etcd.service
+        dest: /etc/systemd/system/etcd.service
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Setup daemon
+      ansible.builtin.systemd_service:
+        state: restarted
+        name: etcd
+        daemon_reload: true
+        enabled: true

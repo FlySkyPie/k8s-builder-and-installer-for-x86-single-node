@@ -1,13 +1,12 @@
 ---
 - name: Hello world
-  hosts: server
+  hosts: arachne-node-alpha
   tasks:
-    # task 1
-    - name: Test connection
-      ansible.builtin.ping:
-      register: message
+    - name: Just execute df -h
+      ansible.builtin.command: df -h
+      register: output
+      changed_when: output.rc == 0
 
-    # task 2
-    - name: Print debug message
+    - name: Show stdout
       ansible.builtin.debug:
-        msg: "{{ message }}"
+        msg: "{{ output.stdout_lines }}"

@@ -1,0 +1,6 @@
+---
+arachne:
+  hosts:
+    arachne-node-alpha:
+      ansible_host: 192.168.0.144
+      ansible_user: root
