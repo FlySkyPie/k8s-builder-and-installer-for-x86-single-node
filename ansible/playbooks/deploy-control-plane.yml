@@ -21,14 +21,7 @@
         - ../../.cache/certificates/kubernetes-key.pem
         - ../../.cache/certificates/service-account.pem
         - ../../.cache/certificates/service-account-key.pem
-
-    - name: Copy Encryption Config file
-      ansible.builtin.copy:
-        src: ../../.cache/certificates/encryption-config.yaml
-        dest: /etc/kubernetes/config/encryption-config.yaml
-        owner: root
-        group: root
-        mode: "0644"
+        - ../../.cache/certificates/encryption-config.yaml
 
     - name: Copy executables
       ansible.builtin.copy:
@@ -54,6 +47,14 @@
         - ../../.cache/services/kube-apiserver.service
         - ../../.cache/services/kube-scheduler.service
         - ../../.cache/services/kube-controller-manager.service
+
+    - name: Copy Configure for Kubernetes Scheduler
+      ansible.builtin.copy:
+        src: ../../.cache/services/kube-scheduler.yaml
+        dest: /etc/kubernetes/config/kube-scheduler.yaml
+        owner: root
+        group: root
+        mode: "0644"
 
     - name: Setup kube-apiserver daemon
       ansible.builtin.systemd_service:

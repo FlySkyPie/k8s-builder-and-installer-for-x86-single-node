@@ -58,3 +58,9 @@ ETCDCTL_API=3 etcdctl member list \
 ```shell
 ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/deploy-control-plane.yml
 ```
+
+Check API Server:
+
+```shell
+curl --cacert ./.cache/certificates/ca.pem https://192.168.0.144:6443/livez?verbose
+```
