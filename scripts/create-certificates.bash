@@ -20,7 +20,10 @@ fi
 
 echo "[Certificate Authority]"
 
-cat >ca-config.json <<EOF
+if [ -f ca-config.json ]; then
+  echo "File 'ca-config.json' exist, skip."
+else
+  cat >ca-config.json <<EOF
 {
   "signing": {
     "default": {
@@ -35,8 +38,12 @@ cat >ca-config.json <<EOF
   }
 }
 EOF
+fi
 
-cat >ca-csr.json <<EOF
+if [ -f ca-csr.json ]; then
+  echo "File 'ca-csr.json' exist, skip."
+else
+  cat >ca-csr.json <<EOF
 {
   "CN": "Kubernetes",
   "key": {
@@ -54,14 +61,22 @@ cat >ca-csr.json <<EOF
   ]
 }
 EOF
+fi
 
-cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+if [ -f ca.pem ]; then
+  echo "File 'ca.pem' exist, skip."
+else
+  cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+fi
 
 # ===============
 
 echo "[The Admin Client Certificate]"
 
-cat >admin-csr.json <<EOF
+if [ -f admin-csr.json ]; then
+  echo "File 'admin-csr.json' exist, skip."
+else
+  cat >admin-csr.json <<EOF
 {
   "CN": "admin",
   "key": {
@@ -79,19 +94,27 @@ cat >admin-csr.json <<EOF
   ]
 }
 EOF
+fi
 
-cfssl gencert \
-  -ca=ca.pem \
-  -ca-key=ca-key.pem \
-  -config=ca-config.json \
-  -profile=kubernetes \
-  admin-csr.json | cfssljson -bare admin
+if [ -f admin-key.pem ]; then
+  echo "File 'admin-key.pem' exist, skip."
+else
+  cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -profile=kubernetes \
+    admin-csr.json | cfssljson -bare admin
+fi
 
 # ===============
 
 echo "[The Kubelet Client Certificates]"
 
-cat >${NODE_NAME}-csr.json <<EOF
+if [ -f ${NODE_NAME}-csr.json ]; then
+  echo "File '${NODE_NAME}-csr.json' exist, skip."
+else
+  cat >${NODE_NAME}-csr.json <<EOF
 {
   "CN": "system:node:${NODE_NAME}",
   "key": {
@@ -109,20 +132,28 @@ cat >${NODE_NAME}-csr.json <<EOF
   ]
 }
 EOF
+fi
 
-cfssl gencert \
-  -ca=ca.pem \
-  -ca-key=ca-key.pem \
-  -config=ca-config.json \
-  -hostname=${NODE_NAME},${NODE_IP},127.0.0.1 \
-  -profile=kubernetes \
-  ${NODE_NAME}-csr.json | cfssljson -bare ${NODE_NAME}
+if [ -f ${NODE_NAME}.pem ]; then
+  echo "File '${NODE_NAME}.pem' exist, skip."
+else
+  cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -hostname=${NODE_NAME},${NODE_IP},127.0.0.1 \
+    -profile=kubernetes \
+    ${NODE_NAME}-csr.json | cfssljson -bare ${NODE_NAME}
+fi
 
 # ===============
 
 echo "[The Controller Manager Client Certificate]"
 
-cat >kube-controller-manager-csr.json <<EOF
+if [ -f kube-controller-manager-csr.json ]; then
+  echo "File 'kube-controller-manager-csr.json' exist, skip."
+else
+  cat >kube-controller-manager-csr.json <<EOF
 {
   "CN": "system:kube-controller-manager",
   "key": {
@@ -140,19 +171,27 @@ cat >kube-controller-manager-csr.json <<EOF
   ]
 }
 EOF
+fi
 
-cfssl gencert \
-  -ca=ca.pem \
-  -ca-key=ca-key.pem \
-  -config=ca-config.json \
-  -profile=kubernetes \
-  kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
+if [ -f kube-controller-manager.pem ]; then
+  echo "File 'kube-controller-manager.pem' exist, skip."
+else
+  cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -profile=kubernetes \
+    kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
+fi
 
 # ===============
 
 echo "[The Kube Proxy Client Certificate]"
 
-cat >kube-proxy-csr.json <<EOF
+if [ -f kube-proxy-csr.json ]; then
+  echo "File 'kube-proxy-csr.json' exist, skip."
+else
+  cat >kube-proxy-csr.json <<EOF
 {
   "CN": "system:kube-proxy",
   "key": {
@@ -170,19 +209,27 @@ cat >kube-proxy-csr.json <<EOF
   ]
 }
 EOF
+fi
 
-cfssl gencert \
-  -ca=ca.pem \
-  -ca-key=ca-key.pem \
-  -config=ca-config.json \
-  -profile=kubernetes \
-  kube-proxy-csr.json | cfssljson -bare kube-proxy
+if [ -f kube-proxy.pem ]; then
+  echo "File 'kube-proxy.pem' exist, skip."
+else
+  cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -profile=kubernetes \
+    kube-proxy-csr.json | cfssljson -bare kube-proxy
+fi
 
 # ===============
 
 echo "[The Scheduler Client Certificate]"
 
-cat >kube-scheduler-csr.json <<EOF
+if [ -f kube-scheduler-csr.json ]; then
+  echo "File 'kube-scheduler-csr.json' exist, skip."
+else
+  cat >kube-scheduler-csr.json <<EOF
 {
   "CN": "system:kube-scheduler",
   "key": {
@@ -200,13 +247,18 @@ cat >kube-scheduler-csr.json <<EOF
   ]
 }
 EOF
+fi
 
-cfssl gencert \
-  -ca=ca.pem \
-  -ca-key=ca-key.pem \
-  -config=ca-config.json \
-  -profile=kubernetes \
-  kube-scheduler-csr.json | cfssljson -bare kube-scheduler
+if [ -f kube-scheduler.pem ]; then
+  echo "File 'kube-scheduler.pem' exist, skip."
+else
+  cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -profile=kubernetes \
+    kube-scheduler-csr.json | cfssljson -bare kube-scheduler
+fi
 
 # ===============
 
@@ -214,7 +266,10 @@ echo "[The Kubernetes API Server Certificate]"
 
 KUBERNETES_HOSTNAMES=kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local
 
-cat >kubernetes-csr.json <<EOF
+if [ -f kubernetes-csr.json ]; then
+  echo "File 'kubernetes-csr.json' exist, skip."
+else
+  cat >kubernetes-csr.json <<EOF
 {
   "CN": "kubernetes",
   "key": {
@@ -232,20 +287,28 @@ cat >kubernetes-csr.json <<EOF
   ]
 }
 EOF
+fi
 
-cfssl gencert \
-  -ca=ca.pem \
-  -ca-key=ca-key.pem \
-  -config=ca-config.json \
-  -hostname=${NODE_IP},127.0.0.1,${KUBERNETES_HOSTNAMES} \
-  -profile=kubernetes \
-  kubernetes-csr.json | cfssljson -bare kubernetes
+if [ -f kubernetes.pem ]; then
+  echo "File 'kubernetes.pem' exist, skip."
+else
+  cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -hostname=${NODE_IP},127.0.0.1,${KUBERNETES_HOSTNAMES} \
+    -profile=kubernetes \
+    kubernetes-csr.json | cfssljson -bare kubernetes
+fi
 
 # ===============
 
 echo "[The Service Account Key Pair]"
 
-cat >service-account-csr.json <<EOF
+if [ -f service-account-csr.json ]; then
+  echo "File 'service-account-csr.json' exist, skip."
+else
+  cat >service-account-csr.json <<EOF
 {
   "CN": "service-accounts",
   "key": {
@@ -263,10 +326,15 @@ cat >service-account-csr.json <<EOF
   ]
 }
 EOF
+fi
 
-cfssl gencert \
-  -ca=ca.pem \
-  -ca-key=ca-key.pem \
-  -config=ca-config.json \
-  -profile=kubernetes \
-  service-account-csr.json | cfssljson -bare service-account
+if [ -f service-account.pem ]; then
+  echo "File 'service-account.pem' exist, skip."
+else
+  cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -profile=kubernetes \
+    service-account-csr.json | cfssljson -bare service-account
+fi

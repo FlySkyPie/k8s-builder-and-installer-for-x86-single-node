@@ -43,3 +43,12 @@ make
 ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/deploy-etcd.yml
 ```
 
+Check etcd:
+
+```shell
+ETCDCTL_API=3 etcdctl member list \
+--endpoints https://192.168.0.144:2379 \
+--cacert=./.cache/certificates/ca.pem \
+--cert=./.cache/certificates/kubernetes.pem \
+--key=./.cache/certificates/kubernetes-key.pem
+```
