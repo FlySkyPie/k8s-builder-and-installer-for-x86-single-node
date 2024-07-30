@@ -5,6 +5,7 @@ CACHE_ROOT="${WORKD_DIR_ROOT}/.cache"
 
 NODE_NAME="arachne-node-alpha"
 NODE_IP="192.168.0.144"
+ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64)
 
 mkdir -p ${CACHE_ROOT}/certificates
 cd ${CACHE_ROOT}/certificates
@@ -16,6 +17,26 @@ fi
 if ! command -v cfssljson &>/dev/null; then
   echo "cfssljson could not be found"
   exit 1
+fi
+
+echo "[Encryption Config]"
+
+if [ -f encryption-config.yaml ]; then
+  echo "File 'encryption-config.yaml' exist, skip."
+else
+  cat >encryption-config.yaml <<EOF
+kind: EncryptionConfig
+apiVersion: v1
+resources:
+  - resources:
+      - secrets
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: ${ENCRYPTION_KEY}
+      - identity: {}
+EOF
 fi
 
 echo "[Certificate Authority]"

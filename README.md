@@ -52,3 +52,9 @@ ETCDCTL_API=3 etcdctl member list \
 --cert=./.cache/certificates/kubernetes.pem \
 --key=./.cache/certificates/kubernetes-key.pem
 ```
+
+### Deploy Control Plane
+
+```shell
+ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/deploy-control-plane.yml
+```

@@ -1,0 +1,77 @@
+---
+- name: Deploy Control Plane
+  hosts: arachne-node-alpha
+  tasks:
+    - name: Create folders
+      ansible.builtin.command: mkdir -p /etc/kubernetes/config /var/lib/kubernetes/
+      register: mymotd
+      changed_when: true
+
+    - name: Copy certificates
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: /var/lib/kubernetes/
+        owner: root
+        group: root
+        mode: "0600"
+      loop:
+        - ../../.cache/certificates/ca.pem
+        - ../../.cache/certificates/ca-key.pem
+        - ../../.cache/certificates/kubernetes.pem
+        - ../../.cache/certificates/kubernetes-key.pem
+        - ../../.cache/certificates/service-account.pem
+        - ../../.cache/certificates/service-account-key.pem
+
+    - name: Copy Encryption Config file
+      ansible.builtin.copy:
+        src: ../../.cache/certificates/encryption-config.yaml
+        dest: /etc/kubernetes/config/encryption-config.yaml
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Copy executables
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: /usr/local/bin/
+        owner: root
+        group: root
+        mode: "0755"
+      loop:
+        - ../../.cache/kubernetes/_output/dockerized/bin/linux/386/kube-apiserver
+        - ../../.cache/kubernetes/_output/dockerized/bin/linux/386/kube-controller-manager
+        - ../../.cache/kubernetes/_output/dockerized/bin/linux/386/kube-scheduler
+        - ../../.cache/kubernetes/_output/dockerized/bin/linux/386/kubectl
+
+    - name: Copy service files
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: /etc/systemd/system/
+        owner: root
+        group: root
+        mode: "0644"
+      loop:
+        - ../../.cache/services/kube-apiserver.service
+        - ../../.cache/services/kube-scheduler.service
+        - ../../.cache/services/kube-controller-manager.service
+
+    - name: Setup kube-apiserver daemon
+      ansible.builtin.systemd_service:
+        state: restarted
+        name: kube-apiserver
+        daemon_reload: true
+        enabled: true
+
+    - name: Setup kube-scheduler daemon
+      ansible.builtin.systemd_service:
+        state: restarted
+        name: kube-scheduler
+        daemon_reload: true
+        enabled: true
+
+    - name: Setup kube-controller-manager daemon
+      ansible.builtin.systemd_service:
+        state: restarted
+        name: kube-controller-manager
+        daemon_reload: true
+        enabled: true
