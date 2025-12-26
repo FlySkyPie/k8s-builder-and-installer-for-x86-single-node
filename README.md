@@ -1,4 +1,7 @@
-# My x86 K8s Installer
+# My x86 K8s Installer (WIP)
+
+> [!CAUTION]
+> This is unfinished project, used to learning K8s myself, and probably never finished.
 
 ## Prerequisites
 
@@ -64,3 +67,9 @@ Check API Server:
 ```shell
 curl --cacert ./.cache/certificates/ca.pem https://192.168.0.144:6443/livez?verbose
 ```
+
+## Credit
+
+This project won't exist without the tutorial:
+
+https://github.com/kelseyhightower/kubernetes-the-hard-way
